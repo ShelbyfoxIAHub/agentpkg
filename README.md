@@ -43,6 +43,25 @@ python -m pip install -e ".[documents]"
 python -m unittest discover -s tests -v
 ```
 
+#### Windows PowerShell
+
+From the project directory, create and install into a virtual environment, then
+run the tests:
+
+```powershell
+py -m venv .venv
+.\.venv\Scripts\python.exe -m pip install ".[documents]"
+.\.venv\Scripts\python.exe -m unittest discover -s tests -v
+```
+
+To use the `agentpkg` command directly, activate the environment with
+`.\.venv\Scripts\Activate.ps1`. If you do not activate it, run commands with
+`.\.venv\Scripts\python.exe -m agentpkg.cli`, for example:
+
+```powershell
+.\.venv\Scripts\python.exe -m agentpkg.cli --help
+```
+
 ### Quick start
 
 Package a directory with one command:
@@ -160,6 +179,25 @@ Para desarrollo:
 ```bash
 python -m pip install -e ".[documents]"
 python -m unittest discover -s tests -v
+```
+
+#### Windows PowerShell
+
+Desde la carpeta del proyecto, crea e instala el entorno virtual y ejecuta las
+pruebas:
+
+```powershell
+py -m venv .venv
+.\.venv\Scripts\python.exe -m pip install ".[documents]"
+.\.venv\Scripts\python.exe -m unittest discover -s tests -v
+```
+
+Para usar directamente el comando `agentpkg`, activa el entorno con
+`.\.venv\Scripts\Activate.ps1`. Si no lo activas, ejecuta los comandos mediante
+`.\.venv\Scripts\python.exe -m agentpkg.cli`, por ejemplo:
+
+```powershell
+.\.venv\Scripts\python.exe -m agentpkg.cli --help
 ```
 
 ### Inicio rápido
