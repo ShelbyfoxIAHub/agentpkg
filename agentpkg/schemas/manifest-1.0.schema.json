@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ShelbyfoxIAHub/agentpkg/schemas/manifest-1.0.schema.json",
+  "title": "agentpkg manifest 1.0 (compatibility mode)",
+  "type": "object",
+  "required": ["spec_version", "name"],
+  "properties": {
+    "spec_version": {"type": "string", "pattern": "^1\\.0$"},
+    "name": {"type": "string", "maxLength": 1024, "pattern": "^[^\\u0000-\\u001f\\u007f]*$"},
+    "description": {"type": "string", "maxLength": 100000},
+    "author": {"type": "string", "maxLength": 1024},
+    "created_at": {"type": "string", "maxLength": 64},
+    "data_summary": {
+      "type": "object",
+      "properties": {
+        "file_count": {"type": "integer", "minimum": 0},
+        "primary_languages": {"type": "array", "maxItems": 64, "items": {"type": "string", "maxLength": 64}},
+        "categories": {"type": "array", "maxItems": 64, "items": {"type": "string", "maxLength": 64}}
+      }
+    },
+    "entry_points": {"type": "array", "maxItems": 100000, "items": {"type": "string", "maxLength": 1024}}
+  }
+}

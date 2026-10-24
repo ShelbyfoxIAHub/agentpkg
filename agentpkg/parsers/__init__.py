@@ -2,6 +2,7 @@
 
 from pathlib import Path
 
+from agentpkg.plugins import parsers as parser_plugins
 from agentpkg.parsers.docx_parser import parse_docx, parse_docx_bytes
 from agentpkg.parsers.pdf_parser import parse_pdf, parse_pdf_bytes
 from agentpkg.parsers.xlsx_parser import parse_xlsx, parse_xlsx_bytes
@@ -35,6 +36,9 @@ def parse_bytes(data: bytes, filename: str) -> str:
         return parse_xlsx_bytes(data)
     if suffix in _TEXT_SUFFIXES:
         return data.decode("utf-8")
+    for plugin in parser_plugins.create_all():
+        if suffix in tuple(getattr(plugin, "suffixes", ())):
+            return plugin.parse(data, filename)
     if b"\0" not in data:
         try:
             return data.decode("utf-8")

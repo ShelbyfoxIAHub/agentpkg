@@ -4,10 +4,12 @@ import json
 import os
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Optional
+from typing import Iterable, Optional
 from zipfile import ZIP_DEFLATED, ZipFile
 
 from agentpkg import SPEC_VERSION
+from agentpkg.manifest import build_manifest_fields, file_record, sha256_stream
+from agentpkg.schema import validate_manifest
 
 
 def create_package(
@@ -16,8 +18,17 @@ def create_package(
     title: Optional[str] = None,
     description: str = "",
     author: str = "",
+    spec_version: str = SPEC_VERSION,
+    capabilities: Iterable[str] = (),
+    dependencies: Iterable[dict] = (),
 ) -> dict:
-    """Package the files in a directory and return the generated manifest."""
+    """Package the files in a directory and return the generated manifest.
+
+    ``spec_version="1.0"`` produces the legacy manifest layout (compatibility
+    mode); the default produces the semantic 1.1 layout with SHA-256 hashes.
+    """
+    if spec_version not in ("1.0", "1.1"):
+        raise ValueError("Cannot create packages with spec_version {}".format(spec_version))
     source = Path(source).expanduser().resolve()
     destination = Path(destination).expanduser().resolve()
     if not source.exists():
@@ -57,18 +68,40 @@ def create_package(
         for path in directories
     ]
     manifest = {
-        "spec_version": SPEC_VERSION,
+        "spec_version": spec_version,
         "name": title or source.name,
         "description": description,
         "author": author,
         "created_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
-        "data_summary": {
+    }
+    if spec_version == "1.0":
+        manifest["data_summary"] = {
             "file_count": len(files),
             "primary_languages": [],
             "categories": [],
-        },
-        "entry_points": data_paths,
-    }
+        }
+        manifest["entry_points"] = data_paths
+    else:
+        records = []
+        for path, archive_path in zip(files, data_paths):
+            with path.open("rb") as handle:
+                digest = sha256_stream(handle)
+            records.append(file_record(archive_path, path.stat().st_size, digest))
+        by_path = dict(zip(data_paths, files))
+
+        def read_text(archive_path):
+            try:
+                return by_path[archive_path].read_text(encoding="utf-8")
+            except (UnicodeDecodeError, OSError):
+                return None
+
+        manifest.update(
+            build_manifest_fields(
+                records, read_text, capabilities=capabilities,
+                dependencies=dependencies,
+            )
+        )
+    validate_manifest(manifest)
 
     destination.parent.mkdir(parents=True, exist_ok=True)
     try:
