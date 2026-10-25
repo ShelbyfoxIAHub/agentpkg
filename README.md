@@ -1,27 +1,22 @@
 ﻿# agentpkg
 
-Formato y herramientas portatiles para empaquetar, indexar y consultar conocimientos estructurados mediante IA local y MCP.
+Formato y conjunto de herramientas portatiles para empaquetar, indexar y consultar repositorios, habilidades e indices estructurados para IA local y MCP.
+
+![agentpkg Architecture](https://raw.githubusercontent.com/ShelbyfoxIAHub/agentpkg/main/docs/architecture.png)
 
 ## Caracteristicas
-
-- Manifiesto e Integridad SHA-256 (verify)
-- Conectores LLM Locales (Ollama: llama3.2, nomic-embed-text)
-- Busqueda Vectorial y RAG (index, search, ask)
-- Servidor MCP Integrado (serve con herramientas search_package y ask_package)
-- Analizadores Avanzados (PDF, DOCX, XLSX, HTML y CSV)
-- Empaquetado Inteligente y .agentpkgignore
+- 📜 Manifiesto Semantico e Integridad SHA-256 (`verify`)
+- 🤖 Conectores LLM Locales (Ollama: `llama3.2`, `nomic-embed-text`)
+- 🔍 Busqueda Vectorial y RAG (`index`, `search`, `ask`)
+- 🔌 Servidor MCP Integrado (`serve`)
+- 📄 Analizadores Avanzados (PDF, DOCX, XLSX, HTML, CSV)
+- 📦 Clonado y Empaquetado Directo de Repositorios Git (`pack-repo`)
 
 ## Comandos CLI
 
-### 1. Empaquetar y Verificar
-python -m agentpkg.cli pack ./mi_carpeta -o mi_paquete.agentpkg --name "Mi Coleccion"
-python -m agentpkg.cli inspect mi_paquete.agentpkg
-python -m agentpkg.cli verify mi_paquete.agentpkg
+### Clonar y Empaquetar Repositorios Git
+python -m agentpkg.cli pack-repo https://github.com/usuario/repositorio.git -o repo.agentpkg
 
-### 2. Indexacion Vectorial y Consultas RAG
-python -m agentpkg.cli index mi_paquete.agentpkg --model ollama:nomic-embed-text
-python -m agentpkg.cli search mi_paquete.agentpkg "consulta"
-python -m agentpkg.cli ask mi_paquete.agentpkg "pregunta"
-
-### 3. Servidor MCP
-python -m agentpkg.cli serve mi_paquete.agentpkg
+### Inspeccionar e Indexar
+python -m agentpkg.cli inspect repo.agentpkg
+python -m agentpkg.cli index repo.agentpkg --model ollama:nomic-embed-text
