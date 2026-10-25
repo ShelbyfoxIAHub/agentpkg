@@ -1,12 +1,8 @@
-__pycache__/
-*.py[cod]
-*.egg-info/
-build/
-dist/
+﻿__pycache__/
+*.pyc
+*.agentpkg
+test_build_src/
+test_sample/
 .venv/
 venv/
 .pytest_cache/
-.coverage
-htmlcov/
-*.agentpkg
-desktop.ini

@@ -1,0 +1,87 @@
+﻿{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AgentPackage Manifest Specification",
+  "type": "object",
+  "required": [
+    "spec_version",
+    "name",
+    "description",
+    "author",
+    "created_at",
+    "data_summary",
+    "capabilities",
+    "dependencies",
+    "entry_points",
+    "integrity"
+  ],
+  "properties": {
+    "spec_version": {
+      "type": "string",
+      "description": "Version of the agentpkg specification (e.g. 1.0.0)."
+    },
+    "name": {
+      "type": "string",
+      "description": "Title or name of the package."
+    },
+    "description": {
+      "type": "string"
+    },
+    "author": {
+      "type": "string"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "data_summary": {
+      "type": "object",
+      "required": ["file_count", "primary_languages", "categories"],
+      "properties": {
+        "file_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "primary_languages": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "categories": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "capabilities": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "dependencies": {
+      "type": "object"
+    },
+    "entry_points": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "integrity": {
+      "type": "object",
+      "required": ["algorithm", "files"],
+      "properties": {
+        "algorithm": {
+          "type": "string",
+          "enum": ["sha256"]
+        },
+        "files": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        },
+        "signature": {
+          "type": "object",
+          "properties": {
+            "key_id": { "type": "string" },
+            "signature": { "type": "string" }
+          }
+        }
+      }
+    }
+  }
+}
