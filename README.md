@@ -6,7 +6,7 @@
 
 ## 🚀 Características Principales
 
-* 📦 **Empaquetado Estructurado:** Genera paquetes portátiles `.agentpkg` con `data/` y `manifest.json`.
+* 📦 **Empaque{Zvo Estructurado:** Genera paquetes portátiles `.agentpkg` con `data/` y `manifest.json`.
 * 🏷️ **Detección Semántica:** Categoriza automáticamente contenido (`skill`, `config_mcp`, `vector`, `graph`, `database`, `dataset`, `code`, `document`).
 * 🛡️ **Integridad SHA-256:** Firma por archivo y hash criptográfico global.
 * 🔒 **Seguridad Estricta:** Aislamiento de rutas y bloqueo de symlinks no seguros.
@@ -35,10 +35,10 @@
 ## 🗺️ Hoja de Ruta (Roadmap)
 
 - [x] **Fase 1: Manifiesto Semántico e Integridad**
-- [ ] **Fase 2: Conectores a Modelos (`agentpkg ask`)**
-- [ ] **Fase 3: Índices y Búsqueda Portátil (`agentpkg search`)**
-- [ ] **Fase 4: Servidor MCP y Habilidades (`agentpkg serve`)**
-- [ ] **Fase 5: Ecosistema y Parsers Extendidos**
+- [x] **Fase 2: Conectores a Modelos (`agentpkg ask`)**
+- [x] **Fase 3: Índices y Búsqueda Portátil (`agentpkg search`)**
+- [x] **Fase 4: Servidor MCP y Habilidades (`agentpkg serve`)**
+- [x] **Fase 5: Ecosistema y Parsers Extendidos**
 
 ---
 
