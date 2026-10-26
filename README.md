@@ -1,22 +1,48 @@
-﻿# agentpkg
+﻿# 📦 agentpkg
 
-Formato y conjunto de herramientas portatiles para empaquetar, indexar y consultar repositorios, habilidades e indices estructurados para IA local y MCP.
+**agentpkg** es un estándar abierto, portátil y seguro para empaquetar contexto, datos, herramientas e índices de conocimiento destinados a Agentes de IA.
 
-![agentpkg Architecture](https://raw.githubusercontent.com/ShelbyfoxIAHub/agentpkg/main/docs/architecture.png)
+---
 
-## Caracteristicas
-- 📜 Manifiesto Semantico e Integridad SHA-256 (`verify`)
-- 🤖 Conectores LLM Locales (Ollama: `llama3.2`, `nomic-embed-text`)
-- 🔍 Busqueda Vectorial y RAG (`index`, `search`, `ask`)
-- 🔌 Servidor MCP Integrado (`serve`)
-- 📄 Analizadores Avanzados (PDF, DOCX, XLSX, HTML, CSV)
-- 📦 Clonado y Empaquetado Directo de Repositorios Git (`pack-repo`)
+## 🚀 Características Principales
 
-## Comandos CLI
+* 📦 **Empaquetado Estructurado:** Genera paquetes portátiles `.agentpkg` con `data/` y `manifest.json`.
+* 🏷️ **Detección Semántica:** Categoriza automáticamente contenido (`skill`, `config_mcp`, `vector`, `graph`, `database`, `dataset`, `code`, `document`).
+* 🛡️ **Integridad SHA-256:** Firma por archivo y hash criptográfico global.
+* 🔒 **Seguridad Estricta:** Aislamiento de rutas y bloqueo de symlinks no seguros.
+* ښ�️ **Filtros Flexibles:** Soporte para `.agentpkgignore`, `--include` y `--exclude`.
+* 📄 **Parsers de Documentos:** Extracción nativa de texto de `.pdf`, `.docx` y `.xlsx`.
 
-### Clonar y Empaquetar Repositorios Git
-python -m agentpkg.cli pack-repo https://github.com/usuario/repositorio.git -o repo.agentpkg
+---
 
-### Inspeccionar e Indexar
-python -m agentpkg.cli inspect repo.agentpkg
-python -m agentpkg.cli index repo.agentpkg --model ollama:nomic-embed-text
+## 🛠️ Estructura del Manifiesto (`manifest.json`)
+
+```json
+{
+  "spec_version": "1.0",
+  "name": "mi_paquete",
+  "categories": ["code", "document"],
+  "primary_languages": ["Python"],
+  "integrity": {
+    "algorithm": "sha256",
+    "hash": "..."
+  }
+}
+```
+
+---
+
+## 🗺️ Hoja de Ruta (Roadmap)
+
+- [x] **Fase 1: Manifiesto Semántico e Integridad**
+- [ ] **Fase 2: Conectores a Modelos (`agentpkg ask`)**
+- [ ] **Fase 3: Índices y Búsqueda Portátil (`agentpkg search`)**
+- [ ] **Fase 4: Servidor MCP y Habilidades (`agentpkg serve`)**
+- [ ] **Fase 5: Ecosistema y Parsers Extendidos**
+
+---
+
+## 📄 Licencia
+
+MIT License
+
