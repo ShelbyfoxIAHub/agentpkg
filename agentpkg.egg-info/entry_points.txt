@@ -1,0 +1,2 @@
+[console_scripts]
+agentpkg = agentpkg.cli:main

@@ -1,32 +1,21 @@
-﻿"""Model connectors factory and public interface for agentpkg."""
-
-from agentpkg.connectors.base import BaseConnector
+﻿from agentpkg.connectors.base import ModelConnector, BaseConnector
 from agentpkg.connectors.ollama import OllamaConnector
 from agentpkg.connectors.openai import OpenAIConnector
 
+OPENAI_COMPATIBLE_PROVIDERS = {"openai", "vllm", "lmstudio", "groq", "openrouter"}
 
-def get_connector(model_spec: str) -> BaseConnector:
-    """
-    Factory function to instantiate a model connector.
-    
-    Examples:
-        - "ollama:llama3" -> OllamaConnector(model="llama3")
-        - "openai:gpt-4o" -> OpenAIConnector(model="gpt-4o")
-        - "llama3" (default provider is ollama) -> OllamaConnector(model="llama3")
-    """
-    if ":" in model_spec:
-        provider, model_name = model_spec.split(":", 1)
-    else:
-        provider, model_name = "ollama", model_spec
+def get_connector(spec: str) -> ModelConnector:
+    if ":" not in spec:
+        return OllamaConnector(model=spec)
 
+    provider, model = spec.split(":", 1)
     provider = provider.lower()
 
     if provider == "ollama":
-        return OllamaConnector(model=model_name)
-    elif provider in ("openai", "vllm", "lmstudio", "groq"):
-        return OpenAIConnector(model=model_name)
+        return OllamaConnector(model=model)
+    elif provider in OPENAI_COMPATIBLE_PROVIDERS:
+        return OpenAIConnector(model=model)
     else:
-        raise ValueError(f"Unsupported model provider: '{provider}' in spec '{model_spec}'")
+        raise ValueError(f"Proveedor de modelo no soportado: '{provider}'")
 
-
-__all__ = ["BaseConnector", "OllamaConnector", "OpenAIConnector", "get_connector"]
+__all__ = ["ModelConnector", "BaseConnector", "OllamaConnector", "OpenAIConnector", "get_connector"]

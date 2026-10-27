@@ -1,7 +1,4 @@
-﻿"""HTML text extractor using standard library html.parser."""
-
-from html.parser import HTMLParser
-
+﻿from html.parser import HTMLParser
 
 class HTMLTextExtractor(HTMLParser):
     def __init__(self):
@@ -10,32 +7,23 @@ class HTMLTextExtractor(HTMLParser):
         self.skip = False
 
     def handle_starttag(self, tag, attrs):
-        if tag.lower() in ["script", "style", "head"]:
+        if tag.lower() in ["script", "style"]:
             self.skip = True
 
     def handle_endtag(self, tag):
-        if tag.lower() in ["script", "style", "head"]:
+        if tag.lower() in ["script", "style"]:
             self.skip = False
 
     def handle_data(self, data):
         if not self.skip:
-            text = data.strip()
-            if text:
-                self.result.append(text)
+            self.result.append(data)
 
-    def get_text(self) -> str:
-        return " ".join(self.result)
+    def get_text(self):
+        return " ".join("".join(self.result).split())
 
-
-def parse_html_bytes(data: bytes) -> str:
-    """Extract clean text from HTML bytes."""
-    html_content = data.decode("utf-8", errors="ignore")
+def parse_html(content: bytes | str) -> str:
+    if isinstance(content, bytes):
+        content = content.decode("utf-8", errors="ignore")
     parser = HTMLTextExtractor()
-    parser.feed(html_content)
+    parser.feed(content)
     return parser.get_text()
-
-
-def parse_html(file_path) -> str:
-    """Extract clean text from HTML file."""
-    with open(file_path, "rb") as f:
-        return parse_html_bytes(f.read())

@@ -1,78 +1,70 @@
-﻿"""Ollama model connector using Python standard library."""
-
-import json
-import os
-import urllib.error
+﻿import json
 import urllib.request
+import urllib.error
 from typing import List, Dict, Any
-from agentpkg.connectors.base import BaseConnector
+from agentpkg.connectors.base import ModelConnector
 
-
-class OllamaConnector(BaseConnector):
-    """Connector for local Ollama instance (http://localhost:11434 by default)."""
-
-    def __init__(self, model: str = "llama3", host: str = None):
+class OllamaConnector(ModelConnector):
+    def __init__(self, model: str = "llama3", host: str = "http://localhost:11434", timeout: int = 60, batch_size: int = 32):
         self.model = model
-        self.host = host or os.getenv("OLLAMA_HOST", "http://localhost:11434").rstrip("/")
+        self.host = host.rstrip("/")
+        self.timeout = timeout
+        self.batch_size = batch_size
 
     def chat(self, messages: List[Dict[str, str]], **kwargs: Any) -> str:
         url = f"{self.host}/api/chat"
-        payload = {
-            "model": self.model,
-            "messages": messages,
-            "stream": False,
-        }
-        payload.update(kwargs)
-
+        payload = {"model": self.model, "messages": messages, "stream": False}
         req = urllib.request.Request(
             url,
             data=json.dumps(payload).encode("utf-8"),
-            headers={"Content-Type": "application/json"},
-            method="POST",
+            headers={"Content-Type": "application/json"}
         )
-
-        with urllib.request.urlopen(req) as response:
-            res_data = json.loads(response.read().decode("utf-8"))
-            return res_data.get("message", {}).get("content", "")
+        with urllib.request.urlopen(req, timeout=self.timeout) as response:
+            res = json.loads(response.read().decode("utf-8"))
+            return res.get("message", {}).get("content", "")
 
     def embed(self, texts: List[str], **kwargs: Any) -> List[List[float]]:
-        # Intentar con la API moderna de Ollama (/api/embed)
-        url_embed = f"{self.host}/api/embed"
-        payload = {"model": self.model, "input": texts}
-        payload.update(kwargs)
-
-        req = urllib.request.Request(
-            url_embed,
-            data=json.dumps(payload).encode("utf-8"),
-            headers={"Content-Type": "application/json"},
-            method="POST",
-        )
-
-        try:
-            with urllib.request.urlopen(req) as response:
-                res_data = json.loads(response.read().decode("utf-8"))
-                if "embeddings" in res_data:
-                    return res_data["embeddings"]
-        except urllib.error.HTTPError as error:
-            if error.code != 404:
-                raise
-
-        # Respaldo para versiones legacy de Ollama (/api/embeddings)
-        embeddings = []
-        for text in texts:
-            url = f"{self.host}/api/embeddings"
-            payload = {"model": self.model, "prompt": text}
-            payload.update(kwargs)
-
+        if not texts:
+            return []
+        
+        all_embeddings = []
+        
+        for i in range(0, len(texts), self.batch_size):
+            batch = texts[i:i + self.batch_size]
+            url = f"{self.host}/api/embed"
+            payload = {"model": self.model, "input": batch}
+            data = json.dumps(payload).encode("utf-8")
+            
             req = urllib.request.Request(
                 url,
-                data=json.dumps(payload).encode("utf-8"),
-                headers={"Content-Type": "application/json"},
-                method="POST",
+                data=data,
+                headers={"Content-Type": "application/json"}
             )
+            
+            try:
+                with urllib.request.urlopen(req, timeout=self.timeout) as response:
+                    res = json.loads(response.read().decode("utf-8"))
+                    all_embeddings.extend(res.get("embeddings", []))
+            except urllib.error.HTTPError as e:
+                if e.code == 404:
+                    all_embeddings.extend(self._embed_legacy(batch))
+                else:
+                    raise e
+                    
+        return all_embeddings
 
-            with urllib.request.urlopen(req) as response:
-                res_data = json.loads(response.read().decode("utf-8"))
-                embeddings.append(res_data.get("embedding", []))
-
+    def _embed_legacy(self, texts: List[str]) -> List[List[float]]:
+        embeddings = []
+        url = f"{self.host}/api/embeddings"
+        for text in texts:
+            payload = {"model": self.model, "prompt": text}
+            data = json.dumps(payload).encode("utf-8")
+            req = urllib.request.Request(
+                url,
+                data=data,
+                headers={"Content-Type": "application/json"}
+            )
+            with urllib.request.urlopen(req, timeout=self.timeout) as response:
+                res = json.loads(response.read().decode("utf-8"))
+                embeddings.append(res.get("embedding", []))
         return embeddings

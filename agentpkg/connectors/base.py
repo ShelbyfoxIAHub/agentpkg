@@ -1,18 +1,16 @@
-﻿"""Base class for model connectors in agentpkg."""
-
-from abc import ABC, abstractmethod
+﻿from abc import ABC, abstractmethod
 from typing import List, Dict, Any
 
-
-class BaseConnector(ABC):
-    """Abstract base class for LLM and Embedding model connectors."""
-
+class ModelConnector(ABC):
     @abstractmethod
     def chat(self, messages: List[Dict[str, str]], **kwargs: Any) -> str:
-        """Send a list of messages (role/content) to the model and return response string."""
+        """Envía el historial de conversación al modelo y retorna la respuesta."""
         pass
 
     @abstractmethod
     def embed(self, texts: List[str], **kwargs: Any) -> List[List[float]]:
-        """Generate numerical vector embeddings for a list of text strings."""
+        """Genera representaciones en vectores (embeddings) para una lista de textos."""
         pass
+
+# Alias de compatibilidad
+BaseConnector = ModelConnector

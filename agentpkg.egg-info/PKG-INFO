@@ -1,0 +1,71 @@
+Metadata-Version: 2.4
+Name: agentpkg
+Version: 1.0.0
+Summary: Estandar y herramientas para empaquetar e indexar conocimiento para IA.
+License-Expression: MIT
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Provides-Extra: dev
+Requires-Dist: pytest; extra == "dev"
+Provides-Extra: pdf
+Requires-Dist: pypdf; extra == "pdf"
+Provides-Extra: docx
+Requires-Dist: python-docx; extra == "docx"
+Provides-Extra: xlsx
+Requires-Dist: openpyxl; extra == "xlsx"
+Provides-Extra: all
+Requires-Dist: pypdf; extra == "all"
+Requires-Dist: python-docx; extra == "all"
+Requires-Dist: openpyxl; extra == "all"
+Requires-Dist: pytest; extra == "all"
+Dynamic: license-file
+
+﻿# 📦 agentpkg
+
+**agentpkg** es un estándar abierto, portátil y seguro para empaquetar contexto, datos, herramientas e índices de conocimiento destinados a Agentes de IA.
+
+---
+
+## 🚀 Características Principales
+
+* 📦 **Empaque{Zvo Estructurado:** Genera paquetes portátiles `.agentpkg` con `data/` y `manifest.json`.
+* 🏷️ **Detección Semántica:** Categoriza automáticamente contenido (`skill`, `config_mcp`, `vector`, `graph`, `database`, `dataset`, `code`, `document`).
+* 🛡️ **Integridad SHA-256:** Firma por archivo y hash criptográfico global.
+* 🔒 **Seguridad Estricta:** Aislamiento de rutas y bloqueo de symlinks no seguros.
+* ښ�️ **Filtros Flexibles:** Soporte para `.agentpkgignore`, `--include` y `--exclude`.
+* 📄 **Parsers de Documentos:** Extracción nativa de texto de `.pdf`, `.docx` y `.xlsx`.
+
+---
+
+## 🛠️ Estructura del Manifiesto (`manifest.json`)
+
+```json
+{
+  "spec_version": "1.0",
+  "name": "mi_paquete",
+  "categories": ["code", "document"],
+  "primary_languages": ["Python"],
+  "integrity": {
+    "algorithm": "sha256",
+    "hash": "..."
+  }
+}
+```
+
+---
+
+## 🗺️ Hoja de Ruta (Roadmap)
+
+- [x] **Fase 1: Manifiesto Semántico e Integridad**
+- [x] **Fase 2: Conectores a Modelos (`agentpkg ask`)**
+- [x] **Fase 3: Índices y Búsqueda Portátil (`agentpkg search`)**
+- [x] **Fase 4: Servidor MCP y Habilidades (`agentpkg serve`)**
+- [x] **Fase 5: Ecosistema y Parsers Extendidos**
+
+---
+
+## 📄 Licencia
+
+MIT License
+

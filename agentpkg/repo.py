@@ -1,7 +1,10 @@
-﻿import os
+import os
 import shutil
 import subprocess
 import tempfile
+import json
+import urllib.request
+import urllib.parse
 from pathlib import Path
 from typing import Dict, List, Tuple
 from agentpkg.builder import create_package
@@ -72,3 +75,26 @@ def clone_and_pack_repo(repo_url: str, output_path: str, name: str = None) -> di
         )
         
         return out_pkg
+
+def search_github_repos(query: str, limit: int = 5) -> List[dict]:
+    """Busca repositorios publicos en GitHub por termino de busqueda."""
+    encoded_query = urllib.parse.quote(query)
+    url = f"https://api.github.com/search/repositories?q={encoded_query}&per_page={limit}"
+    req = urllib.request.Request(url, headers={"User-Agent": "agentpkg-cli"})
+    
+    try:
+        with urllib.request.urlopen(req) as response:
+            data = json.loads(response.read().decode("utf-8"))
+            items = data.get("items", [])
+            results = []
+            for item in items:
+                results.append({
+                    "full_name": item.get("full_name"),
+                    "description": item.get("description"),
+                    "stars": item.get("stargazers_count"),
+                    "clone_url": item.get("clone_url")
+                })
+            return results
+    except Exception as e:
+        print(f"Error al consultar la API de GitHub: {e}")
+        return []

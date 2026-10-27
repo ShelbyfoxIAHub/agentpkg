@@ -1,40 +1,41 @@
-﻿"""Package integrity and manifest validation."""
-
-import json
-import hashlib
+﻿import json
 import zipfile
 from pathlib import Path
-from typing import Dict, Any, List, Tuple
+from agentpkg.crypto import compute_bytes_hash
 
-
-def verify_package_integrity(package_path: str) -> Tuple[bool, List[str]]:
-    """
-    Verify the SHA-256 integrity of all files inside an .agentpkg package.
-    Returns (is_valid, list_of_error_messages).
-    """
+def verify_package_integrity(package_path: Path) -> tuple[bool, list[str]]:
+    package_path = Path(package_path)
     errors = []
-    
-    with zipfile.ZipFile(package_path, "r") as zip_ref:
-        if "manifest.json" not in zip_ref.namelist():
-            return False, ["Error: El paquete no contiene manifest.json."]
 
-        manifest_data = json.loads(zip_ref.read("manifest.json").decode("utf-8"))
-        integrity_info = manifest_data.get("integrity", {})
-        expected_hashes = integrity_info.get("files", {})
+    if not package_path.exists():
+        return False, [f"Package file not found: {package_path}"]
 
-        if not expected_hashes:
-            return False, ["Advertencia: El manifiesto no contiene registros de integridad SHA-256."]
+    try:
+        with zipfile.ZipFile(package_path, "r") as z:
+            if "manifest.json" not in z.namelist():
+                return False, ["Missing manifest.json"]
 
-        for file_path, expected_hash in expected_hashes.items():
-            if file_path not in zip_ref.namelist():
-                errors.append(f"Falta el archivo: '{file_path}'")
-                continue
+            manifest_bytes = z.read("manifest.json")
+            manifest = json.loads(manifest_bytes.decode("utf-8"))
 
-            file_bytes = zip_ref.read(file_path)
-            actual_hash = hashlib.sha256(file_bytes).hexdigest()
+            hashes = manifest.get("hashes", {})
+            integrity_files = manifest.get("integrity", {}).get("files", {})
+            expected_hashes = {**hashes, **integrity_files}
 
-            if actual_hash != expected_hash:
-                errors.append(f"Hash no coincide en '{file_path}': esperado {expected_hash[:8]}..., real {actual_hash[:8]}...")
+            for name in z.namelist():
+                if name.endswith("/") or name == "manifest.json":
+                    continue
+                
+                content = z.read(name)
+                computed_hash = compute_bytes_hash(content)
+                rel_name = name[5:] if name.startswith("data/") else name
+                
+                expected = expected_hashes.get(name) or expected_hashes.get(rel_name)
+                
+                if expected and computed_hash != expected:
+                    errors.append(f"Hash mismatch for {name}: expected {expected}, got {computed_hash}")
 
-    is_valid = len(errors) == 0
-    return is_valid, errors
+    except Exception as e:
+        return False, [f"Corrupted archive: {str(e)}"]
+
+    return len(errors) == 0, errors
